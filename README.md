@@ -54,7 +54,7 @@
 
 ## Демонстрация
 
-![Демонстрация](demo.mp4)
+![Демонстрация](demo-compressed-compressed.mp4)
 
 ---
 
