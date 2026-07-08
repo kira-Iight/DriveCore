@@ -1,0 +1,86 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # Django + Daphne сервер
+  web:
+    build: .
+    container_name: drivecore-web
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./logs:/app/logs
+      - ./media:/app/media
+      - ./staticfiles:/app/staticfiles
+      - ./db.sqlite3:/app/db.sqlite3
+      - ./vector_db.sqlite3:/app/vector_db.sqlite3
+    command: daphne -b 0.0.0.0 -p 8000 config.asgi:application
+    restart: unless-stopped
+    depends_on:
+      - ollama
+
+  # Celery Worker (фоновые задачи)
+  celery_worker:
+    build: .
+    container_name: drivecore-celery-worker
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings
+      - CELERY_BROKER_URL=memory://
+    volumes:
+      - ./logs:/app/logs
+      - ./db.sqlite3:/app/db.sqlite3
+      - ./vector_db.sqlite3:/app/vector_db.sqlite3
+    command: celery -A config worker --loglevel=info --pool=solo
+    restart: unless-stopped
+    depends_on:
+      - web
+
+  # Celery Beat (планировщик)
+  celery_beat:
+    build: .
+    container_name: drivecore-celery-beat
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings
+      - CELERY_BROKER_URL=memory://
+    volumes:
+      - ./logs:/app/logs
+      - ./db.sqlite3:/app/db.sqlite3
+    command: celery -A config beat --loglevel=info
+    restart: unless-stopped
+    depends_on:
+      - celery_worker
+
+  # Ollama сервер
+  ollama:
+    image: ollama/ollama:latest
+    container_name: drivecore-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    command: serve
+    restart: unless-stopped
+
+  # Telegram бот
+  telegram_bot:
+    build: .
+    container_name: drivecore-telegram-bot
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+    volumes:
+      - ./logs:/app/logs
+      - ./db.sqlite3:/app/db.sqlite3
+      - ./vector_db.sqlite3:/app/vector_db.sqlite3
+    command: python telegram_bot/bot.py
+    restart: unless-stopped
+    depends_on:
+      - web
+      - ollama
+    profiles:
+      - telegram

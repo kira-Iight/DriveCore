@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveCore — ИИ-ассистент</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">D</span>
+                <span class="logo-text">DriveCore</span>
+                <span class="logo-sub">Платформенная занятость</span>
+            </div>
+            <div class="user-info">
+                <span id="userName">Гость (войдите)</span>
+                <button id="logoutBtn" class="btn btn-sm btn-danger" style="display:none">Выйти</button>
+            </div>
+        </header>
+
+        <!-- Навигация -->
+        <nav class="nav">
+            <button class="nav-btn active" data-tab="dashboard">Дашборд</button>
+            <button class="nav-btn" data-tab="chat">Чат</button>
+            <button class="nav-btn" data-tab="taxes">Налоги</button>
+            <button class="nav-btn" data-tab="profile">Профиль</button>
+        </nav>
+
+        <!-- Основной контент -->
+        <main class="main">
+            <!-- ===== Дашборд ===== -->
+            <section id="tab-dashboard" class="tab active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">$</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Общий доход</div>
+                            <div class="stat-value" id="totalIncome">0 ₽</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">%</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Налоги</div>
+                            <div class="stat-value" id="totalTax">0 ₽</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">L</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Лимит дохода</div>
+                            <div class="stat-value" id="remainingLimit">2.4M ₽</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Динамика дохода</h3>
+                    <canvas id="incomeChart"></canvas>
+                </div>
+            </section>
+
+            <!-- ===== Чат ===== -->
+            <section id="tab-chat" class="tab">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <span>ИИ-ассистент</span>
+                        <span class="chat-status online">Онлайн</span>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message assistant">
+                            <div class="message-avatar">AI</div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-author">Ассистент</span>
+                                    <span class="message-time">Только что</span>
+                                </div>
+                                <div class="message-text">
+                                    Здравствуйте! Я ваш ИИ-ассистент.<br>
+                                    Задайте любой вопрос о налогах, документах или работе.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="typingIndicator" class="typing-indicator" style="display: none;">
+                            <span>AI</span>
+                            <span class="dot">.</span>
+                            <span class="dot">.</span>
+                            <span class="dot">.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Введите ваш вопрос..." />
+                        <button id="sendBtn">Отправить</button>
+                        <div class="quick-questions">
+                            <button class="quick-btn" data-question="Как получить разрешение?">Разрешение</button>
+                            <button class="quick-btn" data-question="Сколько налогов платить?">Налоги</button>
+                            <button class="quick-btn" data-question="Как открыть ИП?">ИП</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== Налоги ===== -->
+            <section id="tab-taxes" class="tab">
+                <div class="tax-calculator">
+                    <h2>Налоговый калькулятор</h2>
+                    <div class="form-group">
+                        <label>Доход (₽)</label>
+                        <input type="number" id="taxIncome" value="100000" />
+                    </div>
+                    <div class="form-group">
+                        <label>Статус</label>
+                        <select id="taxStatus">
+                            <option value="self_employed">Самозанятый</option>
+                            <option value="ie">ИП</option>
+                            <option value="employee">Наёмный работник</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Регион</label>
+                        <input type="text" id="taxRegion" value="Москва" />
+                    </div>
+                    <button id="calcTaxBtn" class="btn btn-primary">Рассчитать налог</button>
+
+                    <div id="taxResult" class="tax-result" style="display:none;">
+                        <h3>Результат расчета</h3>
+                        <div class="result-grid">
+                            <div class="result-item">
+                                <span class="result-label">Ставка налога</span>
+                                <span class="result-value" id="taxRateResult">0%</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Сумма налога</span>
+                                <span class="result-value" id="taxAmountResult">0 ₽</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Чистый доход</span>
+                                <span class="result-value" id="netIncomeResult">0 ₽</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== Профиль ===== -->
+            <section id="tab-profile" class="tab">
+                <div class="profile-card">
+                    <h2>Профиль пользователя</h2>
+                    <div class="profile-info">
+                        <div class="profile-row">
+                            <span class="profile-label">Имя</span>
+                            <span id="profileName">-</span>
+                        </div>
+                        <div class="profile-row">
+                            <span class="profile-label">Роль</span>
+                            <span id="profileRole">-</span>
+                        </div>
+                        <div class="profile-row">
+                            <span class="profile-label">Статус</span>
+                            <span id="profileStatus">-</span>
+                        </div>
+                        <div class="profile-row">
+                            <span class="profile-label">Доход</span>
+                            <span id="profileIncome">-</span>
+                        </div>
+                        <div class="profile-row">
+                            <span class="profile-label">Документы</span>
+                            <span id="profileDocs">-</span>
+                        </div>
+                    </div>
+                    
+                    <div id="loginForm">
+                        <h3>Вход в систему</h3>
+                        <div class="form-group">
+                            <label>Логин</label>
+                            <input type="text" id="loginUsername" value="admin" />
+                        </div>
+                        <div class="form-group">
+                            <label>Пароль</label>
+                            <input type="password" id="loginPassword" value="admin123" />
+                        </div>
+                        <button id="loginBtn" class="btn btn-primary">Войти</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

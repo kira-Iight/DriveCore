@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+venv/
+env/
+.venv/
+.env
+*.sqlite3
+*.db
+
+# Django
+*.log
+*.pid
+*.pot
+*.mo
+local_settings.py
+db.sqlite3
+media/
+staticfiles/
+static/
+*.sqlite3-journal
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+*.cover
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Docker
+ollama_data/
+
+# Reports
+coverage.xml
+*.report
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Logs
+logs/*.log
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local

@@ -1,0 +1,40 @@
+# Django
+Django==5.0.6
+djangorestframework==3.15.1
+django-cors-headers==4.3.1
+django-ckeditor==6.7.1
+
+# WebSockets
+channels==4.0.0
+
+# API
+djangorestframework-simplejwt==5.3.0
+drf-yasg==1.21.7
+django-filter==24.2
+
+# AI
+sentence-transformers==2.2.2
+transformers==4.38.0
+torch==2.2.0
+
+# Фоновые задачи
+celery==5.3.6
+django-celery-beat==2.6.0
+django-celery-results==2.5.1
+
+# Telegram
+python-telegram-bot==20.7
+
+# PDF и парсинг
+feedparser==6.0.10
+beautifulsoup4==4.12.2
+requests==2.31.0
+
+# ASGI
+daphne==4.1.0
+uvicorn==0.30.0
+
+# Утилиты
+python-dotenv==1.0.1
+pillow==10.2.0
+python-magic==0.4.27
